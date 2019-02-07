@@ -65,7 +65,6 @@ function CPiece (n, color, x0, y0, x1, y1, x2, y2, x3, y3) {
     for (var i=0; i<5; i++) this.colors.push(color);
   }
 
-
     this.vBuffer=0;
     this.cBuffer=0;
 
