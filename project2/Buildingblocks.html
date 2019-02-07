@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<title>Buildingblocks</title>
+<h1>CS435 project# 2  Shengting Cao</h1>
+<p> 1.	Red disk
+    2.	Green disk
+    3.	Blue disk
+    4.	Magenta square
+    5.	Cyan square
+    6.	Yellow square
+<br>
+Hold 1 to 6 on the keyboard and click the canvas to add disks and square
+<br>
+Click on the shape and move mouse to drag the block
+<br>
+Hold shift key and click on the block to delete the block
+</p>
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute vec4 vPosition;
+attribute vec4 vColor;
+
+varying vec4 color;
+
+uniform mat4 projection;
+uniform mat4 transformation;
+
+void main()
+{
+    gl_Position = projection*transformation*vPosition;
+    color=vColor;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+
+varying vec4 color;
+
+void main()
+{
+    gl_FragColor = color;
+}
+</script>
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="Buildingblocks.js"></script>
+</head>
+
+
+<body>
+<div>
+<canvas id="gl-canvas" width="800" height="600">
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+</div>
+
+</body>
+</html>
