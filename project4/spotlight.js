@@ -67,12 +67,6 @@ function main() {
 
     drawScene();
 
-    // Setup a ui.
-    // webglLessonsUI.setupSlider("#fRotation", {value: radToDeg(fRotationRadians), slide: updateRotation, min: -360, max: 360});
-    // webglLessonsUI.setupSlider("#lightRotationX", {value: lightRotationX, slide: updatelightRotationX, min: -2, max: 2, precision: 2, step: 0.001});
-    // webglLessonsUI.setupSlider("#lightRotationY", {value: lightRotationY, slide: updatelightRotationY, min: -2, max: 2, precision: 2, step: 0.001});
-    // webglLessonsUI.setupSlider("#innerLimit", {value: radToDeg(innerLimit), slide: updateInnerLimit, min: 0, max: 180});
-    // webglLessonsUI.setupSlider("#outerLimit", {value: radToDeg(outerLimit), slide: updateOuterLimit, min: 0, max: 180});
     document.getElementById("slider0").onchange = function(event) {
         fRotationRadians = event.target.value;
        drawScene();
@@ -226,6 +220,15 @@ function divideGeometry(a,b,c,d)
 }
 // Fill the buffer with the values of cubes
 function setGeometry(gl) {
+  var newPosition = [
+    vec4(-100,-100,0,1),
+    vec4(-100,150,0,1),
+    vec4(150,-100,0,1),
+    vec4(-100,150,0,1),
+    vec4(150,150,0,1),
+    vec4(150,-100,0,1)
+  ];
+  // var positions = flatten(newPosition);
     var positions = new Float32Array([
         // left column front
         -100,   -100,  0,
@@ -252,14 +255,7 @@ function setGeometry(gl) {
         positions[ii + 2] = vector[2];
     }
     // console.log("vect is ",vector[0]);
-    var newPosition = [
-      vec4(-100,-100,0),
-      vec4(-100,150,0),
-      vec4(150,-100,0),
-      vec4(-100,150,0),
-      vec4(150,150,0),
-      vec4(150,-100,0)
-    ];
+
 
     console.log(positions);
     console.log(flatten(newPosition));
@@ -288,6 +284,7 @@ function setNormals(gl) {
     console.log("flatten newNormals", flatten(newNormals));
     gl.bufferData(gl.ARRAY_BUFFER, flatten(newNormals), gl.STATIC_DRAW);
 }
+
 function transformPoint(m, v, dst) {
     dst = dst || new Float32Array(3);
     var v0 = v[0];
