@@ -219,24 +219,31 @@ function main() {
         gl.drawArrays(primitiveType, offset, count);
     }
 }
+//function for divide geometry
+function divideGeometry(a,b,c,d)
+{
 
-// Fill the buffer with the values that define a letter 'F'.
+}
+// Fill the buffer with the values of cubes
 function setGeometry(gl) {
     var positions = new Float32Array([
         // left column front
-        -20,   -20,  0,
-        -20, 150,  0,
-        150,  -20,  0,
-        -20, 150,  0,
+        -100,   -100,  0,
+        -100, 150,  0,
+        150,  -100,  0,
+        -100, 150,  0,
         150, 150,  0,
-        150,   -20,  0]);
+        150,   -100,  0]);
 
     var matrix = m4xRotation(Math.PI);
-    console.log(matrix);
-    console.log(translate(Math.PI,1,0,0));
+    // var matrix = rotate(Math.PI,1,0,0);
+    console.log(rotate(Math.PI, 1,0,0));
+    // console.log(matrix);
+    // console.log(translate(Math.PI,1,0,0));
     //var matrix = rotate(Math.PI, 1,0,0);
-    matrix = m4translate(matrix, -50, -75, -15);
+    // matrix = m4translate(matrix, -50, -75, -15);
     //matrix = matrix * translate(-50,-75,-15);
+    console.log("matrix", matrix);
     for (var ii = 0; ii < positions.length; ii += 3) {
         var vector = transformPoint(matrix,
             [positions[ii + 0], positions[ii + 1], positions[ii + 2], 1]);
@@ -244,9 +251,20 @@ function setGeometry(gl) {
         positions[ii + 1] = vector[1];
         positions[ii + 2] = vector[2];
     }
-    console.log("vect is ",vector[0]);
+    // console.log("vect is ",vector[0]);
+    var newPosition = [
+      vec4(-100,-100,0),
+      vec4(-100,150,0),
+      vec4(150,-100,0),
+      vec4(-100,150,0),
+      vec4(150,150,0),
+      vec4(150,-100,0)
+    ];
 
-    gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+    console.log(positions);
+    console.log(flatten(newPosition));
+    gl.bufferData(gl.ARRAY_BUFFER,positions,gl.STATIC_DRAW);
+    // gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
 }
 
 function setNormals(gl) {
@@ -258,7 +276,17 @@ function setNormals(gl) {
         0, 0, 1,
         0, 0, 1,
         0, 0, 1]);
-    gl.bufferData(gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
+    var newNormals = [
+      vec3(0,0,1),
+      vec3(0,0,1),
+      vec3(0,0,1),
+      vec3(0,0,1),
+      vec3(0,0,1),
+      vec3(0,0,1),
+    ]
+    console.log("normals",normals);
+    console.log("flatten newNormals", flatten(newNormals));
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(newNormals), gl.STATIC_DRAW);
 }
 function transformPoint(m, v, dst) {
     dst = dst || new Float32Array(3);
