@@ -1,5 +1,5 @@
 "use strict";
-
+var switchModel = 0;
 function main() {
     // Get A WebGL context
 
@@ -8,10 +8,17 @@ function main() {
     if (!gl) {
         return;
     }
-
+    console.log(switchModel);
     // setup GLSL program
    // var program = webglUtils.createProgramFromScripts(gl, ["3d-vertex-shader", "3d-fragment-shader"]);
+
+
     var program = initShaders( gl, "vertex-shader", "fragment-shader" );
+    if(switchModel == 1){
+      var program = initShaders(gl, "vertex-shader1","fragment-shader1");
+    }
+
+
     gl.useProgram( program );
 
     // look up where the vertex data needs to go.
@@ -66,7 +73,14 @@ function main() {
     var outerLimit = degToRad(20);
 
     drawScene();
-
+    document.getElementById("Button2").onclick = function (){
+        switchModel = 1;
+        main();
+    }
+    document.getElementById("Button1").onclick = function(){
+      switchModel = 0;
+      main();
+    }
     document.getElementById("slider0").onchange = function(event) {
         fRotationRadians = event.target.value;
        drawScene();
@@ -109,7 +123,9 @@ function main() {
         gl.enable(gl.DEPTH_TEST);
 
         // Tell it to use our program (pair of shaders)
+        console.log(switchModel);
         gl.useProgram(program);
+
 
         // Turn on the position attribute
         gl.enableVertexAttribArray(positionLocation);
@@ -236,7 +252,8 @@ function setGeometry(gl) {
         150,  -100,  0,
         -100, 150,  0,
         150, 150,  0,
-        150,   -100,  0]);
+        150,   -100,  0
+      ]);
 
     var matrix = m4xRotation(Math.PI);
     // var matrix = rotate(Math.PI,1,0,0);
@@ -250,6 +267,7 @@ function setGeometry(gl) {
     for (var ii = 0; ii < positions.length; ii += 3) {
         var vector = transformPoint(matrix,
             [positions[ii + 0], positions[ii + 1], positions[ii + 2], 1]);
+
         positions[ii + 0] = vector[0];
         positions[ii + 1] = vector[1];
         positions[ii + 2] = vector[2];
@@ -621,4 +639,4 @@ function m4cross(a, b, dst) {
     dst[2] = a[0] * b[1] - a[1] * b[0];
     return dst;
 }
-main();
+  main();
