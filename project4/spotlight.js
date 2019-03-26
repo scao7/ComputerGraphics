@@ -7,7 +7,7 @@ var vc = vec3(150,150,0);
 var newPosition = [];
 var newNormals = [];
 var index = 0;
-var numTimesToSubdivide = 3;
+var numTimesToSubdivide = 0;
 function main() {
     // Get A WebGL context
     var canvas = document.getElementById("canvas");
