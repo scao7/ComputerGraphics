@@ -1,114 +1,23 @@
 Shengting Cao project4 spotlight
 <br>
 using  up down left right arrow to move the light
-<br>
+<!-- <br>
 rotate <input type="range" min="1" max="20" value="20" id="slider0">
-<br>
+<br> -->
 <button id = 'Button1'>per-fragment shader</button>
 <button id='Button2'>per-vertices shader </button>
 <br><br>
 <button id='Button3'>increase division </button>
+0 <input type="range" min="0" max="7" value="0" id="slider">7
 <button id='Button4'>decrease division </button>
 <br>
 <canvas id="canvas" width="512" height="512" style="border: linen"></canvas>
 
-
-<script id="vertex-shader2" type="x-shader/x-vertex">
-
-// assume both position and normal are in homogeneous form
-
-attribute vec4 vPosition;
-attribute vec4 vNormal;
-
-varying vec4 fColor;
-
-
-uniform vec4 ambientProduct, diffuseProduct, specularProduct;
-uniform mat4 modelViewMatrix;
-uniform mat4 projectionMatrix;
-uniform vec4 lightPosition;
-uniform float shininess;
-uniform mat3 normalMatrix;
-
-
-void
-main()
-{
-
-    // pos is vertex position in eye coordinates
-
-    vec3 pos = (modelViewMatrix * vPosition).xyz;
-
-    // vector from vertex position to light source
-
-    vec3 L;
-
-    // check for directional light
-
-    if(lightPosition.w == 0.0) L = normalize(lightPosition.xyz);
-    else L = normalize( lightPosition.xyz - pos );
-
-    // Because the eye point the is at the orgin
-    // the vector from the vertex position to the eye is
-
-    vec3 E = -normalize( pos );
-
-    // halfway vector
-
-    vec3 H = normalize( L + E );
-
-    // Transform vertex normal into eye coordinates
-
-    vec3 N = normalize( normalMatrix*vNormal.xyz);
-
-
-    // Compute terms in the illumination equation
-    vec4 ambient = ambientProduct;
-
-    float Kd = max( dot(L, N), 0.0 );
-    vec4  diffuse = Kd*diffuseProduct;
-
-    float Ks = pow( max(dot(N, H), 0.0), shininess );
-    vec4  specular = Ks * specularProduct;
-
-    if( dot(L, N) < 0.0 ) {
-	specular = vec4(0.0, 0.0, 0.0, 1.0);
-    }
-
-    gl_Position = projectionMatrix * modelViewMatrix * vPosition;
-
-    fColor = ambient + diffuse +specular;
-
-    fColor.a = 1.0;
-}
-</script>
-
-<script id="fragment-shader2" type="x-shader/x-fragment">
-
-precision mediump float;
-
-varying vec4 fColor;
-
-void
-main()
-{
-
-    gl_FragColor = fColor;
-
-}
-</script>
 <!-- vertex shader program -->
 <script id="vertex-shader1" type="x-shader/x-vertex">
-  precision mediump float;
-
-  uniform vec4 u_color;
-  uniform float u_shininess;
-  uniform vec3 u_lightDirection;
-  uniform float u_innerLimit;          // in dot space
-  uniform float u_outerLimit;          // in dot space
   attribute vec4 a_position;
   attribute vec3 a_normal;
-
+  uniform vec4 ambientProduct, diffuseProduct, specularProduct;
   uniform vec3 u_lightWorldPosition;
   uniform vec3 u_viewWorldPosition;
 
@@ -121,6 +30,15 @@ main()
   varying vec3 v_surfaceToLight;
   varying vec3 v_surfaceToView;
 
+  varying vec4 fColor;
+
+  uniform vec4 u_color;
+  uniform float u_shininess;
+  uniform vec3 u_lightDirection;
+  uniform float u_innerLimit;          // in dot space
+  uniform float u_outerLimit;          // in dot space
+  varying float light;
+  varying float specular;
   void main() {
     // Multiply the position by the matrix.
     gl_Position = u_worldViewProjection * a_position;
@@ -138,7 +56,6 @@ main()
     // compute the vector of the surface to the view/camera
     // and pass it to the fragment shader
     v_surfaceToView = u_viewWorldPosition - surfaceWorldPosition;
-
     // because v_normal is a varying it's interpolated
     // we it will not be a uint vector. Normalizing it
     // will make it a unit vector again
@@ -151,31 +68,35 @@ main()
     float dotFromDirection = dot(surfaceToLightDirection,
                                  -u_lightDirection);
     float inLight = smoothstep(u_outerLimit, u_innerLimit, dotFromDirection);
-    float light = inLight * dot(normal, surfaceToLightDirection);
-    float specular = inLight * pow(dot(normal, halfVector), u_shininess);
-    // Lets multiply just the color portion (not the alpha)
-    // by the light
-  //  gl_FragColor.rgb *= light;
+    light = inLight * dot(normal, surfaceToLightDirection);
+    specular = inLight * pow(dot(normal, halfVector), u_shininess);
 
-    // Just add in the specular
-    //gl_FragColor.rgb += specular;
+    fColor = u_color;
+
 
   }
 </script>
 <!-- fragment shader program -->
 <script id="fragment-shader1" type="x-shader/x-fragment">
   precision mediump float;
-
+  varying vec4 fColor;
   // Passed in from the vertex shader.
   varying vec3 v_normal;
   varying vec3 v_surfaceToLight;
   varying vec3 v_surfaceToView;
-
-  uniform vec4 u_color;
-
-
+  varying float light;
+  varying float specular;
   void main() {
-    gl_FragColor = u_color;
+
+
+    gl_FragColor = fColor;
+
+    // Lets multiply just the color portion (not the alpha)
+    // by the light
+    gl_FragColor.rgb *= light;
+
+    // Just add in the specular
+    gl_FragColor.rgb += specular;
   }
 </script>
 
@@ -183,7 +104,7 @@ main()
 <script id="vertex-shader" type="x-shader/x-vertex">
 attribute vec4 a_position;
 attribute vec3 a_normal;
-
+uniform vec4 ambientProduct, diffuseProduct, specularProduct;
 uniform vec3 u_lightWorldPosition;
 uniform vec3 u_viewWorldPosition;
 

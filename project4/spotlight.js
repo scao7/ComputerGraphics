@@ -1,25 +1,33 @@
 "use strict";
 var switchModel = 0;
+var va = vec3(-100,-100,0);
+var vb = vec3(-100,150,0);
+var vd = vec3(150,-100,0);
+var vc = vec3(150,150,0);
+var newPosition = [];
+var newNormals = [];
+var index = 0;
+var numTimesToSubdivide = 3;
 function main() {
     // Get A WebGL context
-
     var canvas = document.getElementById("canvas");
     var gl = canvas.getContext("webgl");
     if (!gl) {
         return;
     }
-    console.log(switchModel);
     // setup GLSL program
    // var program = webglUtils.createProgramFromScripts(gl, ["3d-vertex-shader", "3d-fragment-shader"]);
 
 
     var program = initShaders( gl, "vertex-shader", "fragment-shader" );
     if(switchModel == 1){
-      var program = initShaders(gl, "vertex-shader1","fragment-shader1");
+      program = initShaders(gl, "vertex-shader1","fragment-shader1");
     }
 
 
     gl.useProgram( program );
+
+
 
     // look up where the vertex data needs to go.
     var positionLocation = gl.getAttribLocation(program, "a_position");
@@ -44,6 +52,24 @@ function main() {
     var positionBuffer = gl.createBuffer();
     // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    //push points
+    // square(va,vb,vc,vd);
+
+    document.getElementById("Button3").onclick = function (){
+      numTimesToSubdivide += 1;
+      index = 0;
+      newPosition = [];
+      newNormals = [];
+      main();
+    }
+    document.getElementById("Button4").onclick = function (){
+      numTimesToSubdivide -= 1;
+      index = 0;
+      newPosition = [];
+      newNormals = [];
+      main();
+    }
+    divideSquare(va,vb,vc,vd,numTimesToSubdivide);
     // Put geometry data into buffer
     setGeometry(gl);
 
@@ -62,29 +88,43 @@ function main() {
         return d * Math.PI / 180;
     }
 
+
     var fieldOfViewRadians = degToRad(60);
     var fRotationRadians = 0;
     var shininess = 150;
     var lightRotationX = 0;
     var lightRotationY = 0;
     var lightDirection = vec3(0,0,1);//[0, 0, 1];  // this is computed in updateScene
-    console.log("light direction", lightDirection);
+
     var innerLimit = degToRad(10);
     var outerLimit = degToRad(20);
 
     drawScene();
+
     document.getElementById("Button2").onclick = function (){
         switchModel = 1;
+
+        newPosition = [];
+        newNormals = [];
+        index = 0;
         main();
     }
     document.getElementById("Button1").onclick = function(){
       switchModel = 0;
+      newPosition = [];
+      newNormals = [];
+      index = 0;
       main();
     }
-    document.getElementById("slider0").onchange = function(event) {
-        fRotationRadians = event.target.value;
-       drawScene();
+
+    document.getElementById("slider").onchange = function(event) {
+      numTimesToSubdivide = event.target.value;
+      newPosition = [];
+      newNormals = [];
+      index = 0;
+       main();
     };
+
     document.addEventListener("keyup",function () {
         if(event.keyCode == 37){
             lightRotationY += 0.1;
@@ -123,9 +163,7 @@ function main() {
         gl.enable(gl.DEPTH_TEST);
 
         // Tell it to use our program (pair of shaders)
-        console.log(switchModel);
         gl.useProgram(program);
-
 
         // Turn on the position attribute
         gl.enableVertexAttribArray(positionLocation);
@@ -168,9 +206,6 @@ function main() {
         var target = vec3(0,0,0);//[0, 35, 0];
         var up = vec3(0,1,0);//[0, 1, 0];
         var cameraMatrix = m4lookAt(camera, target, up);
-         console.log("camera matrix",cameraMatrix);
-        console.log("look at ", lookAt(camera,target,up));
-        console.log("flat", flatten(lookAt(camera,target,up)));
         // Make a view matrix from the camera matrix.
         var viewMatrix = m4inverse(cameraMatrix);
 
@@ -179,8 +214,6 @@ function main() {
 
         // Draw a F at the origin
         var worldMatrix = m4yRotation(fRotationRadians);
-
-        console.log("world matrix is ",worldMatrix);
         // Multiply the matrices.
         var worldViewProjectionMatrix = m4multiply(viewProjectionMatrix, worldMatrix);
         // var worldViewProjectionMatrix = mult(viewProjectionMatrix, worldMatrix);
@@ -196,7 +229,7 @@ function main() {
         gl.uniform4fv(colorLocation, [1, 1, 0, 1]); // yellow
 
         // set the light position
-        const lightPosition = [30, 0, 100];
+        const lightPosition = vec3(30,0,100);//[30, 0, 100];
         gl.uniform3fv(lightWorldPositionLocation, lightPosition);
 
         // set the camera/view position
@@ -226,80 +259,67 @@ function main() {
         var primitiveType = gl.TRIANGLES;
         var offset = 0;
         var count =  6;
-        gl.drawArrays(primitiveType, offset, count);
+
+        for( var i=0; i<index; i+=6)
+            gl.drawArrays( gl.TRIANGLES, i, 6 );
+        // gl.drawArrays(primitiveType, offset, count);
     }
 }
-//function for divide geometry
-function divideGeometry(a,b,c,d)
-{
 
+//function for divide geometry
+function square(a,b,c,d)
+{
+  newPosition.push(a);
+  newPosition.push(b);
+  newPosition.push(c);
+  newPosition.push(d);
+  newPosition.push(a);
+  newPosition.push(c);
+
+  newNormals.push(0,0,1);
+  newNormals.push(0,0,1);
+  newNormals.push(0,0,1);
+  newNormals.push(0,0,1);
+  newNormals.push(0,0,1);
+  newNormals.push(0,0,1);
+  index+=6;
+}
+
+function divideSquare(a,b,c,d,count){
+  if(count > 0){
+    var ab = mix( a, b, 0.5);
+      var ac = mix( a, c, 0.5);
+      var bc = mix( b, c, 0.5);
+      var ad = mix( a, d, 0.5);
+      var cd = mix( c, d, 0.5);
+
+
+      divideSquare( a, ab, ac, ad, count - 1 );
+      divideSquare( ab, b, bc, ac, count - 1 );
+      divideSquare( ac, bc, c, cd, count - 1 );
+      divideSquare( ad, ac, cd, d, count - 1 );
+  }
+  else{
+    square(a,b,c,d);
+  }
 }
 // Fill the buffer with the values of cubes
 function setGeometry(gl) {
-  var newPosition = [
-    vec4(-100,-100,0,1),
-    vec4(-100,150,0,1),
-    vec4(150,-100,0,1),
-    vec4(-100,150,0,1),
-    vec4(150,150,0,1),
-    vec4(150,-100,0,1)
-  ];
-  // var positions = flatten(newPosition);
-    var positions = new Float32Array([
-        // left column front
-        -100,   -100,  0,
-        -100, 150,  0,
-        150,  -100,  0,
-        -100, 150,  0,
-        150, 150,  0,
-        150,   -100,  0
-      ]);
-
+    var positions = flatten(newPosition);
     var matrix = m4xRotation(Math.PI);
-    // var matrix = rotate(Math.PI,1,0,0);
-    console.log(rotate(Math.PI, 1,0,0));
-    // console.log(matrix);
-    // console.log(translate(Math.PI,1,0,0));
-    //var matrix = rotate(Math.PI, 1,0,0);
-    // matrix = m4translate(matrix, -50, -75, -15);
-    //matrix = matrix * translate(-50,-75,-15);
-    console.log("matrix", matrix);
+
     for (var ii = 0; ii < positions.length; ii += 3) {
         var vector = transformPoint(matrix,
             [positions[ii + 0], positions[ii + 1], positions[ii + 2], 1]);
-
         positions[ii + 0] = vector[0];
         positions[ii + 1] = vector[1];
         positions[ii + 2] = vector[2];
     }
-    // console.log("vect is ",vector[0]);
-
-
-    console.log(positions);
-    console.log(flatten(newPosition));
     gl.bufferData(gl.ARRAY_BUFFER,positions,gl.STATIC_DRAW);
-    // gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
 }
 
 function setNormals(gl) {
-    var normals = new Float32Array([
-        // left column front
-        0, 0, 1,
-        0, 0, 1,
-        0, 0, 1,
-        0, 0, 1,
-        0, 0, 1,
-        0, 0, 1]);
-    var newNormals = [
-      vec3(0,0,1),
-      vec3(0,0,1),
-      vec3(0,0,1),
-      vec3(0,0,1),
-      vec3(0,0,1),
-      vec3(0,0,1),
-    ]
-    console.log("normals",normals);
-    console.log("flatten newNormals", flatten(newNormals));
+
     gl.bufferData(gl.ARRAY_BUFFER, flatten(newNormals), gl.STATIC_DRAW);
 }
 
