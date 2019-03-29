@@ -224,12 +224,7 @@ render();
 var render = function(){
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     //theta[axis] += 2.0;
-    if(on == true){
-      configureTexture(image[change]);
-    }
-    else{
-      configureTexture(image[1]);
-    }
+   
     gl.uniform3fv(thetaLoc, flatten(theta));
     gl.drawArrays( gl.TRIANGLES, 0, numVertices );
     requestAnimFrame(render);
