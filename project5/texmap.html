@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
-<style type="text/css">
-    canvas { background: blue; }
-</style>
-
 <button id = "ButtonX">Rotate X</button>
 <button id = "ButtonY">Rotate Y</button>
 <button id = "ButtonZ">Rotate Z</button>
-
-
-
+<button id = "ButtonNext"> Next </button>
+<button id = "ButtonPrev"> Prev </button>
+<button id = "ButtonOn"> ON/OFF </button>
+<br>
+<style type="text/css">
+    canvas { background: blue;}
+</style>
 
 <script id="vertex-shader" type="x-shader/x-vertex">
 
@@ -22,7 +22,10 @@ varying vec2 fTexCoord;
 
 uniform vec3 theta;
 
-void main() 
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+
+void main()
 {
     // Compute the sines and cosines of theta for each of
     //   the three axes in one computation.
@@ -45,11 +48,12 @@ void main()
 		    s.z,  c.z, 0.0, 0.0,
 		    0.0,  0.0, 1.0, 0.0,
 		    0.0,  0.0, 0.0, 1.0 );
-                
+
     fColor = vColor;
     fTexCoord = vTexCoord;
-    gl_Position = rz * ry * rx * vPosition;
-} 
+    gl_Position = modelViewMatrix* rz * ry * rx * vPosition;
+    // gl_Position = modelViewMatrix* projectionMatrix*vPosition;
+}
 </script>
 
 <script id="fragment-shader" type="x-shader/x-fragment">
@@ -71,13 +75,16 @@ main()
 <script type="text/javascript" src="../Common/webgl-utils.js"></script>
 <script type="text/javascript" src="../Common/initShaders.js"></script>
 <script type="text/javascript" src="../Common/MV.js"></script>
-<script type="text/javascript" src="textureCube1.js"></script>
+<script type="text/javascript" src="texmap.js"></script>
 
 
 <body>
-<canvas id="gl-canvas" width="512" height="512">
+<canvas id="gl-canvas" width="512" height="512" style="border: 1px solid black;">
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
 <img id = "texImage" src = "SA2011_black.gif" hidden></img>
+<img id = "texImage2" src = "a1.gif" hidden></img>
+<img id = "texImage1" src = "a2.gif" hidden></img>
+<img id = "texImage3" src = "fancy.gif" hidden></img>
 </body>
 </html>
