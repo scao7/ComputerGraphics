@@ -8,10 +8,13 @@ var texSize = 64;
 var on = true;
 var pause = true;
 var program;
-var modelViewMatrix = rotate(0, 0, 1, 1);
+var modelViewMatrix = rotate(30, -1, 0, 1);
 var pointsArray = [];
 var colorsArray = [];
 var texCoordsArray = [];
+var pointsArrayNoTex = [];
+var colorsArrayNoTex = [];
+var texCoordsArrayNoTex = [];
 var image = [];
 var texture;
 var change = 0;
@@ -96,28 +99,28 @@ function quad(a, b, c, d) {
 }
 
 function quadWithoutTex(a, b, c, d) {
-  pointsArray.push(vertices[a]);
-  colorsArray.push(vertexColors[2]);
+  pointsArrayNoTex.push(vertices[a]);
+  colorsArrayNoTex.push(vertexColors[2]);
   //texCoordsArray.push(texCoord[0]);
 
-  pointsArray.push(vertices[b]);
-  colorsArray.push(vertexColors[2]);
+  pointsArrayNoTex.push(vertices[b]);
+  colorsArrayNoTex.push(vertexColors[2]);
   //texCoordsArray.push(texCoord[1]);
 
-  pointsArray.push(vertices[c]);
-  colorsArray.push(vertexColors[2]);
+  pointsArrayNoTex.push(vertices[c]);
+  colorsArrayNoTex.push(vertexColors[2]);
   //texCoordsArray.push(texCoord[2]);
 
-  pointsArray.push(vertices[a]);
-  colorsArray.push(vertexColors[2]);
+  pointsArrayNoTex.push(vertices[a]);
+  colorsArrayNoTex.push(vertexColors[2]);
   //texCoordsArray.push(texCoord[0]);
 
-  pointsArray.push(vertices[c]);
-  colorsArray.push(vertexColors[2]);
+  pointsArrayNoTex.push(vertices[c]);
+  colorsArrayNoTex.push(vertexColors[2]);
  // texCoordsArray.push(texCoord[2]);
 
-  pointsArray.push(vertices[d]);
-  colorsArray.push(vertexColors[2]);
+  pointsArrayNoTex.push(vertices[d]);
+  colorsArrayNoTex.push(vertexColors[2]);
  //texCoordsArray.push(texCoord[3]);
 }
 
@@ -159,6 +162,7 @@ window.onload = function init() {
 
   colorCube();
 
+  //buffer for tex instance 
   var cBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW);
@@ -170,6 +174,15 @@ window.onload = function init() {
   var vBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW);
+  
+  //add newbuffer for NoTex instance
+  // var cBufferNoTex = gl.createBuffer();
+  // gl.bindBuffer(gl.ARRAY_BUFFER, cBufferNoTex);
+  // gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsArrayNoTex), gl.STATIC_DRAW);
+
+  // var vBufferNoTex = gl.createBuffer();
+  // gl.bindBuffer(gl.ARRAY_BUFFER, vBufferNoTex);
+  // gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArrayNoTex), gl.STATIC_DRAW);
 
 
   modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
@@ -336,8 +349,8 @@ function backWall() {
 }
 
 function holder() {
-  var s = scalem(0.1, 0.5, 0.1);
-  var instanceMatrix = mult(translate(0.0, 0.0, 0.0), s);
+  var s = scalem(0.2, 0.5, 0.2);
+  var instanceMatrix = mult(translate(0.0, -0.3, 0.0), s);
   var t = mult(modelViewMatrix, instanceMatrix);
   gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
   gl.drawArrays(gl.TRIANGLES, 0, numVertices);
