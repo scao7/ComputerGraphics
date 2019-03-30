@@ -7,7 +7,7 @@ var numVertices  = 36;
 
 var texSize = 64;
 var on = true ;
-var pause = false;
+var pause = true;
 var program;
 var modelViewMatrix = rotate(0,0,0,1);
 var pointsArray = [];
@@ -106,12 +106,12 @@ function colorCube()
     quad( 5, 4, 0, 1 );
 }
 function printBase() {
-  var s = scalem(0.1, 0.1, 0.1);
-  var instanceMatrix = mult(translate(0, 0, 0), s);
-  var t = mult(mdvStatic, instanceMatrix);
-  gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-  gl.uniform3fv(thetaLoc, flatten(theta));
-  gl.drawArrays( gl.TRIANGLES, 0, numVertices);
+  var s = scalem(0.5, 0.5, 0.5);
+  var instanceMatrix = mult( translate( 0.0, 0.0, 0.0 ), s);
+  var t = mult(modelViewMatrix, instanceMatrix);
+  gl.uniformMatrix4fv( modelViewMatrixLoc,  false, flatten(t) );
+  gl.drawArrays( gl.TRIANGLES, 0, numVertices );
+
 
 }
 
@@ -250,19 +250,42 @@ var render2 = function(){
         configureTexture[image[3]];
        }
        else configureTexture(image[change]);
-     render()
+     render();
 }
 
 var render = function(){
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     //theta[axis] += 2.0;
    
-    printBase();
+    // printBase();
     drawTV();
+    
+    printBase();
+
+    leftWall();
     requestAnimFrame(render);
 }
 
-var drawTV = function(){
-  gl.uniform3fv(thetaLoc, flatten(theta));
+function drawTV(){
+  var s = scalem(0.3, 0.3, 0.3);
+  var instanceMatrix = mult( translate( 0.0, 0.5 , 0.0 ), s);
+  var t = mult(modelViewMatrix, instanceMatrix);
+  gl.uniformMatrix4fv(modelViewMatrixLoc,  false, flatten(t) );
+  gl.drawArrays( gl.TRIANGLES, 0, numVertices);
+}
+
+function leftWall(){
+  var s = scalem(0.3, 0.3, 0.3);
+  var instanceMatrix = mult( translate( -0.2, 0.5 , 0.0 ), s);
+  var t = mult(modelViewMatrix, instanceMatrix);
+  gl.uniformMatrix4fv(modelViewMatrixLoc,  false, flatten(t) );
+  gl.drawArrays( gl.TRIANGLES, 0, numVertices);
+}
+
+function rightWall(){
+  var s = scalem(0.3, 0.3, 0.3);
+  var instanceMatrix = mult( translate( 0.2, 0.5 , 0.0 ), s);
+  var t = mult(modelViewMatrix, instanceMatrix);
+  gl.uniformMatrix4fv(modelViewMatrixLoc,  false, flatten(t) );
   gl.drawArrays( gl.TRIANGLES, 0, numVertices);
 }
