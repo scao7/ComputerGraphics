@@ -7,14 +7,17 @@ var numVertices  = 36;
 
 var texSize = 64;
 var on = true ;
+var pause = false;
 var program;
-var modelViewMatrix = rotate(0, 0,0,1);
+var modelViewMatrix = rotate(0,0,0,1);
 var pointsArray = [];
 var colorsArray = [];
 var texCoordsArray = [];
 var image = [];
 var texture;
 var change = 0;
+
+var mdvStatic = rotate(45,1,0,0);
 var texCoord = [
     vec2(0, 0),
     vec2(0, 1),
@@ -103,11 +106,13 @@ function colorCube()
     quad( 5, 4, 0, 1 );
 }
 function printBase() {
+  var s = scalem(0.1, 0.1, 0.1);
+  var instanceMatrix = mult(translate(0, 0, 0), s);
+  var t = mult(mdvStatic, instanceMatrix);
+  gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
+  gl.uniform3fv(thetaLoc, flatten(theta));
+  gl.drawArrays( gl.TRIANGLES, 0, numVertices);
 
-  modelViewMatrix = mult(modelViewMatrix, translate(-0.9, 0, 0));
-  gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-  gl.drawArrays(gl.TRIANGLES, 0, 36);
-  // modelViewMatrix = mult(modelViewMatrix, rotate(20, 1, 0, 0));
 }
 
 window.onload = function init() {
@@ -168,23 +173,20 @@ window.onload = function init() {
     //}
     //image.src = "SA2011_black.gif"
 
-
-
-
      image[0] = document.getElementById("texImage");
      image[1] = document.getElementById("texImage1");
      image[2] = document.getElementById("texImage2");
-     image[3] = document.getElementById("textImage3");
+     image[3] = document.getElementById("texImage3");
 
-     configureTexture(image[change]);
-
+     //configureTexture(image[change]);
+    configureTexture(image[change]);
 
 
     thetaLoc = gl.getUniformLocation(program, "theta");
 
-    document.getElementById("ButtonX").onclick = function(){axis = xAxis;};
-    document.getElementById("ButtonY").onclick = function(){axis = yAxis;};
-    document.getElementById("ButtonZ").onclick = function(){axis = zAxis;};
+    // document.getElementById("ButtonX").onclick = function(){axis = xAxis;};
+    // document.getElementById("ButtonY").onclick = function(){axis = yAxis;};
+    // document.getElementById("ButtonZ").onclick = function(){axis = zAxis;};
     document.getElementById("ButtonNext").onclick = function(){
       change += 1;
       if(change > 2 ){
@@ -193,39 +195,74 @@ window.onload = function init() {
 
       configureTexture(image[change]);
 
-      console.log(change);
-       render();
+      render();
     };
+
     document.getElementById("ButtonPrev").onclick = function(){
       change -= 1;
       if(change < 0 ){
         change = 2;
       }
+      if(on)
       configureTexture(image[change]);
-       render();
+      render();
     };
+
     document.getElementById("ButtonOn").onclick = function(){
         if(on == true){
           on = false;
+          configureTexture(image[3]);
         }
         else{
           on = true;
+          configureTexture(image[change]);
         }
-        configureTexture(image[1]);
-        console.log(on);
-       render();
     };
- //printBase();
-render();
 
+    document.getElementById("ButtonPause").onclick = function(){
+      if(pause == true){
+        pause = false;
+      }
+      else{
+        pause = true;
+      }
+      render();
+    };
+    
+   
+    setInterval(function(){ 
+      if(pause){
+        render();
+      }
+      else requestAnimFrame(render2); 
+    }, 1000);
+ 
 }
 
+
+var render2 = function(){
+  //theta[axis] += 2.0;
+      change += 1;
+      if(change > 2 ){
+        change = 0;
+      }
+      if(on == false){
+        configureTexture[image[3]];
+       }
+       else configureTexture(image[change]);
+     render()
+}
 
 var render = function(){
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     //theta[axis] += 2.0;
    
-    gl.uniform3fv(thetaLoc, flatten(theta));
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
+    printBase();
+    drawTV();
     requestAnimFrame(render);
+}
+
+var drawTV = function(){
+  gl.uniform3fv(thetaLoc, flatten(theta));
+  gl.drawArrays( gl.TRIANGLES, 0, numVertices);
 }
