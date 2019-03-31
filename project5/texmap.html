@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+Project5 Shengting Cao, CS435
+<br>
+the button pause/play will play and pause the tv show 
+<br>
+the next and prev button will change the display of the tv
+<br>
 <html>
 <!-- <button id = "ButtonX">Rotate X</button>
 <button id = "ButtonY">Rotate Y</button>
@@ -6,7 +12,7 @@
 <button id = "ButtonNext"> Next </button>
 <button id = "ButtonPrev"> Prev </button>
 <button id = "ButtonOn"> ON/OFF </button>
-<button id = "ButtonPause"> Pause </button>
+<button id = "ButtonPause"> Pause/play </button>
 <br>
 <style type="text/css">
     canvas { background: blue;}
@@ -69,7 +75,8 @@ uniform sampler2D texture;
 void
 main()
 {
-    gl_FragColor = fColor * texture2D( texture, fTexCoord );
+    // gl_FragColor = fColor * texture2D( texture, fTexCoord );
+    gl_FragColor = texture2D( texture, fTexCoord );
 }
 </script>
 
@@ -87,5 +94,9 @@ Oops ... your browser doesn't support the HTML5 canvas element
 <img id = "texImage2" src = "a1.gif" hidden></img>
 <img id = "texImage1" src = "a2.gif" hidden></img>
 <img id = "texImage3" src = "black.gif" hidden></img>
+<img id = "texImage4" src = "wood.gif" hidden></img>
+<img id = "texImage5" src = "wallPaper1.gif" hidden></img>
+<img id = "texImage6" src = "floor.gif" hidden></img>
+<img id = "texImage7" src = "metal.gif" hidden></img>
 </body>
 </html>
