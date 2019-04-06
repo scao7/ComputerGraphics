@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-Project5 Shengting Cao, CS435
+Project6 Shengting Cao, CS435
 <br>
-the button pause/play will play and pause the tv show 
-<br>
-the next and prev button will change the display of the tv
+Use up down left right to change the view 
 <br>
 <html>
 <!-- <button id = "ButtonX">Rotate X</button>
 <button id = "ButtonY">Rotate Y</button>
 <button id = "ButtonZ">Rotate Z</button> -->
-<button id = "ButtonNext"> left </button>
-<button id = "ButtonPrev"> right </button>
-<button id = "ButtonOn"> up </button>
-<button id = "ButtonPause"> down </button>
+<button id="ButtonLeft"> left </button>
+<button id="ButtonRight"> right </button>
+<button id="ButtonUp"> up </button>
+<button id="ButtonDown"> down </button>
 <br>
 <style type="text/css">
-    canvas { background: blue;}
+    canvas {
+        background: blue;
+    }
 </style>
 
 <script id="vertex-shader" type="x-shader/x-vertex">
@@ -83,22 +83,23 @@ main()
 <script type="text/javascript" src="../Common/webgl-utils.js"></script>
 <script type="text/javascript" src="../Common/initShaders.js"></script>
 <script type="text/javascript" src="../Common/MV.js"></script>
-<script type="text/javascript" src="texmap.js"></script>
+<script type="text/javascript" src="blending.js"></script>
 
 
 <body>
-<canvas id="gl-canvas" width="512" height="512" style="border: 1px solid black;">
-Oops ... your browser doesn't support the HTML5 canvas element
-</canvas>
-<img id = "texImage" src = "SA2011_black.gif" hidden></img>
-<img id = "texImage2" src = "a1.gif" hidden></img>
-<img id = "texImage1" src = "a2.gif" hidden></img>
-<img id = "texImage3" src = "black.gif" hidden></img>
-<img id = "texImage4" src = "wood.gif" hidden></img>
-<img id = "texImage5" src = "wallPaper1.gif" hidden></img>
-<img id = "texImage6" src = "floor.gif" hidden></img>
-<img id = "texImage7" src = "metal.gif" hidden></img>
-<img id = "texImage8" src = "window.png" hidden></img>
-<img id = "texImage9" src = "outside.gif" hidden></img>
+    <canvas id="gl-canvas" width="512" height="512" style="border: 1px solid black;">
+        Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
+    <img id="texImage" src="SA2011_black.gif" hidden></img>
+    <img id="texImage2" src="a1.gif" hidden></img>
+    <img id="texImage1" src="a2.gif" hidden></img>
+    <img id="texImage3" src="black.gif" hidden></img>
+    <img id="texImage4" src="wood.gif" hidden></img>
+    <img id="texImage5" src="wallPaper1.gif" hidden></img>
+    <img id="texImage6" src="floor.gif" hidden></img>
+    <img id="texImage7" src="metal.gif" hidden></img>
+    <img id="texImage8" src="window.png" hidden></img>
+    <img id="texImage9" src="outside.gif" hidden></img>
 </body>
+
 </html>

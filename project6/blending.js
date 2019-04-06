@@ -10,7 +10,8 @@ var on = true;
 var pause = true;
 var program;
 var modelViewMatrix = rotate(10, -1, 0, 0);
-modelViewMatrix = mult(rotate(10,0,1,0),modelViewMatrix);
+modelViewMatrix = mult(rotate(10, 0, 1, 0), modelViewMatrix);
+// modelViewMatrix = mult(scalem(1.2,2,1),modelViewMatrix);
 var pointsArray = [];
 var colorsArray = [];
 var texCoordsArray = [];
@@ -21,7 +22,8 @@ var image = [];
 var texture;
 var change = 0;
 
-
+var moveX = 0.0;
+var moveY = 0.0;
 var wallPaper;
 var holderPaper;
 var TVPaper;
@@ -76,12 +78,12 @@ function configureTexture(image) {
     gl.NEAREST_MIPMAP_LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
- // gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
+  // gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
 
   return texture;
 }
 
-function configureTextureRGBA(image){
+function configureTextureRGBA(image) {
   texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
   gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
@@ -92,7 +94,7 @@ function configureTextureRGBA(image){
     gl.NEAREST_MIPMAP_LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
- // gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
+  // gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
 
   return texture;
 }
@@ -179,7 +181,7 @@ window.onload = function init() {
 
   gl.enable(gl.DEPTH_TEST);
   gl.enable(gl.BLEND);
-  gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   //
   //  Load shaders and initialize attribute buffers
   //
@@ -200,7 +202,7 @@ window.onload = function init() {
   var vBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW);
-  
+
   //add newbuffer for NoTex instance
   // var cBufferNoTex = gl.createBuffer();
   // gl.bindBuffer(gl.ARRAY_BUFFER, cBufferNoTex);
@@ -259,103 +261,61 @@ window.onload = function init() {
 
   thetaLoc = gl.getUniformLocation(program, "theta");
 
-  // document.getElementById("ButtonX").onclick = function(){axis = xAxis;};
-  // document.getElementById("ButtonY").onclick = function(){axis = yAxis;};
-  // document.getElementById("ButtonZ").onclick = function(){axis = zAxis;};
-  document.getElementById("ButtonNext").onclick = function () {
-    change += 1;
-    if (change > 2) {
-      change = 0;
-    }
 
-    TVPaper = configureTexture(image[change]);
+  document.getElementById("ButtonLeft").onclick = function () {
+    moveX -= 0.1;
 
     render();
   };
 
-  document.getElementById("ButtonPrev").onclick = function () {
-    change -= 1;
-    if (change < 0) {
-      change = 2;
-    }
-    if (on)
-    TVPaper = configureTexture(image[change]);
+  document.getElementById("ButtonRight").onclick = function () {
+    moveX += 0.1;
     render();
   };
 
-  document.getElementById("ButtonOn").onclick = function () {
-    if (on == true) {
-      on = false;
-      TVPaper = configureTexture(image[3]);
-    }
-    else {
-      on = true;
-      TVPaper = configureTexture(image[change]);
-    }
-  };
-
-  document.getElementById("ButtonPause").onclick = function () {
-    if (pause == true) {
-      pause = false;
-    }
-    else {
-      pause = true;
-    }
+  document.getElementById("ButtonUp").onclick = function () {
+    moveY += 0.1;
     render();
   };
 
+  document.getElementById("ButtonDown").onclick = function () {
+    moveY -= 0.1;
+    render();
+  };
 
-  setInterval(function () {
-    if (pause) {
+  document.addEventListener("keyup", function () {
+    if (event.keyCode == 37) {
+      moveX -= 0.1;
       render();
     }
-    else requestAnimFrame(render2);
-  }, 1000);
+    else if (event.keyCode == 38) {
+      moveY += 0.1;
+      render();
+    }
+    else if (event.keyCode == 40) {
+      moveY -= 0.1;
+      render();
+    }
+    else if (event.keyCode == 39) {
+      moveX += 0.1;
+      render();
+    }
+  })
 
-}
-
-
-var render2 = function () {
-  //theta[axis] += 2.0;
-  change += 1;
-  if (change > 2) {
-    change = 0;
-  }
-  if (on == false) {
-    TVPaper = configureTexture[image[3]];
-  }
-  else TVPaper = configureTexture(image[change]);
   render();
+
 }
+
 
 var render = function () {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  //theta[axis] += 2.0;
 
-  // printBase();
-  // drawTV();
   leftWall();
   rightWall();
   outside();
   backWall();
-  
-  // holder();
-  // backBoard();
   floor();
-  // table();
-  // tableLeg1();
-  // tableLeg2();
-  // neck();
   requestAnimFrame(render);
-}
-
-function drawTV() {
-  var s = scalem(0.8, 0.55, 0.8);
-  var instanceMatrix = mult(translate(0.0, 0.32, 0.1), s);
-  var t = mult(modelViewMatrix, instanceMatrix);
-  gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-  gl.bindTexture(gl.TEXTURE_2D,TVPaper);
-  gl.drawArrays(gl.TRIANGLES, 24, 6);
 }
 
 function leftWall() {
@@ -364,7 +324,7 @@ function leftWall() {
   instanceMatrix = mult(instanceMatrix, rotate(-270, 0, 1, 0));
   var t = mult(modelViewMatrix, instanceMatrix);
   gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-  gl.bindTexture(gl.TEXTURE_2D,wallPaper);
+  gl.bindTexture(gl.TEXTURE_2D, wallPaper);
   gl.drawArrays(gl.TRIANGLES, 0, numVertices);
 }
 
@@ -377,94 +337,39 @@ function rightWall() {
   gl.drawArrays(gl.TRIANGLES, 0, numVertices);
 }
 
-function printBase() {
-  var s = scalem(0.5, 0.5, 0.5);
-  var instanceMatrix = mult(translate(0.0, 0.0, 0.0), s);
-  instanceMatrix = mult(rotate(90, 1, 0, 0), instanceMatrix);
-  instanceMatrix = mult(translate(0.0, -0.5, 0.0), instanceMatrix);
-  var t = mult(modelViewMatrix, instanceMatrix);
-  gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-  gl.drawArrays(gl.TRIANGLES, 0, numVertices);
-}
-
 function backWall() {
   var s = scalem(1.8, 1, 1);
   var instanceMatrix = mult(translate(0.0, 0.0, 0.4), s);
   var t = mult(modelViewMatrix, instanceMatrix);
   gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-  gl.bindTexture(gl.TEXTURE_2D,windowPaper);
-  gl.drawArrays(gl.TRIANGLES, 0 ,6);
+  gl.bindTexture(gl.TEXTURE_2D, windowPaper);
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
 
 function outside() {
-  var s = scalem(1.8, 1, 1);
-  var instanceMatrix = mult(translate(0.0, 0.0, 0.8), s);
+  var s = scalem(2, 2, 2);
+  var instanceMatrix = mult(translate(moveX, moveY, 0.8), s);
   var t = mult(modelViewMatrix, instanceMatrix);
   gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-  gl.bindTexture(gl.TEXTURE_2D,outsidePaper);
-  gl.drawArrays(gl.TRIANGLES, 0 ,numVertices);
-}
-
-
-function holder() {
-  var s = scalem(0.6, 0.08, 1.5);
-  var instanceMatrix = mult(translate(0.0, -0.1, -0.3), s);
-  var t = mult(modelViewMatrix, instanceMatrix);
-  gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-  gl.bindTexture(gl.TEXTURE_2D,metalPaper);
+  gl.bindTexture(gl.TEXTURE_2D, outsidePaper);
   gl.drawArrays(gl.TRIANGLES, 0, numVertices);
 }
-function backBoard(){
+
+function backBoard() {
   var s = scalem(1, 0.6, 0.8);
   var instanceMatrix = mult(translate(0.0, 0.3, 0.18), s);
   var t = mult(modelViewMatrix, instanceMatrix);
   gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-  gl.bindTexture(gl.TEXTURE_2D,metalPaper);
+  gl.bindTexture(gl.TEXTURE_2D, metalPaper);
   gl.drawArrays(gl.TRIANGLES, 0, numVertices);
 }
-function floor(){
+
+function floor() {
   var s = scalem(1.8, 1, 1);
   var instanceMatrix = mult(translate(0.0, -0.6, 0.0), s);
-  instanceMatrix = mult(instanceMatrix,rotate(90,1,0,0));
+  instanceMatrix = mult(instanceMatrix, rotate(90, 1, 0, 0));
   var t = mult(modelViewMatrix, instanceMatrix);
   gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-  gl.bindTexture(gl.TEXTURE_2D,floorPaper);
-  gl.drawArrays(gl.TRIANGLES, 0, numVertices);
-}
-
-function table(){
-  var s = scalem(0.8, 0.5, 0.5);
-  var instanceMatrix = mult(translate(0.0, -0.2, -0.3), s);
-  instanceMatrix = mult(instanceMatrix,rotate(90,1,0,0));
-  var t = mult(modelViewMatrix, instanceMatrix);
-  gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-  gl.bindTexture(gl.TEXTURE_2D,holderPaper);
-  gl.drawArrays(gl.TRIANGLES, 0, numVertices);
-}
-
-function tableLeg1(){
-  var s = scalem(0.1, 0.3, 1.5);
-  var instanceMatrix = mult(translate(0.3, -0.3, -0.3), s);
-  var t = mult(modelViewMatrix, instanceMatrix);
-  gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-  gl.bindTexture(gl.TEXTURE_2D,holderPaper);
-  gl.drawArrays(gl.TRIANGLES, 0, numVertices);
-}
-
-function tableLeg2(){
-  var s = scalem(0.1, 0.3, 1.5);
-  var instanceMatrix = mult(translate(-0.3, -0.3, -0.3), s);
-  var t = mult(modelViewMatrix, instanceMatrix);
-  gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-  gl.bindTexture(gl.TEXTURE_2D,holderPaper);
-  gl.drawArrays(gl.TRIANGLES, 0, numVertices);
-}
-
-function neck(){
-  var s = scalem(0.1, 0.3, 0.7);
-  var instanceMatrix = mult(translate(0.0, -0.1, 0.1), s);
-  var t = mult(modelViewMatrix, instanceMatrix);
-  gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-  gl.bindTexture(gl.TEXTURE_2D,metalPaper);
+  gl.bindTexture(gl.TEXTURE_2D, floorPaper);
   gl.drawArrays(gl.TRIANGLES, 0, numVertices);
 }
