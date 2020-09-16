@@ -1,6 +1,6 @@
 # cs435
 graphics
-link for demostrate: https://scao7.github.io/cs435/
+link for demostrate: https://scao7.github.io/ComputerGraphics/
 
 Projcet #1:
 Create a snowflake by using Koch curve and divide conquer 
